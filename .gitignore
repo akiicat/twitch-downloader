@@ -51,3 +51,6 @@ build-iPhoneSimulator/
 
 # mac
 .DS_Store
+
+# byebug
+.byebug_history
