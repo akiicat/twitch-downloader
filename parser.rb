@@ -45,15 +45,56 @@ class Vedio
       @list.time =  DateTime.parse(time[1]).to_time if time
       @list.secs =  secs[1]                         if secs
     end
-    byebug
   end
 
   def groups
     @list.groups
   end
 
-  def download(start = 0)
+  def download(start = 0, stop = Float::INFINITY)
     @list.each do |part|
+      index = part.split('-')[1].to_i
+      next if not index.between?(start, stop)
+
+      # index-0000007049-876T      .ts?start_offset=0&end_offset=61851
+      # index-0000007049-876T-muted.ts?start_offset=0&end_offset=61851
+      # index-0000004979-plLX      -0.ts
+      # index-0000004979-plLX-muted-0.ts
+      resp = nil
+
+      begin
+        url = link + part
+        puts 'Downloading part ' + url
+        resp = RestClient.get(url)
+      rescue
+        # 'index-xxxxxxxxxx-xxxx'.size # => 21
+        url = link + part.insert(21, '-muted')
+        puts 'Rescueing part ' + url
+        resp = RestClient.get(url)
+      end
+
+      yield(resp)       if block_given?
+    end
+  end
+
+  def download_thread(thread_num = 4)
+    @list.groups.sort_by{|k,v| k}
+
+    threads = []
+
+    thread_num.time do |thread_id|
+      puts "Create thread id: #{thread_id}"
+      threads << Thread.new {
+
+      }
+    end
+
+    threads.each { |t| t.join }
+    puts "Join threads"
+
+
+
+    hash.keys.sort.each do |part|
       if part[0] != '#' && part != ''
         next if not (part.split('-')[1].to_i >= start)
 
