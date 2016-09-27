@@ -17,7 +17,7 @@ vedio.parse
 date     = vedio.list.time.strftime("%Y%m%d")
 dir      = "./vedio/#{vedio_id}"
 
-filename = "#{dir}/#{date}v#{vedio_id}"
+filename = "#{dir}/#{date}_#{vedio_id}"
 
 # create files or directories if not exists
 FileUtils.mkdir_p(dir) unless File.exists?(dir)
