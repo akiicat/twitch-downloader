@@ -15,7 +15,7 @@ vedio.parse
 
 # vedio info
 date     = vedio.list.time.strftime("%Y%m%d")
-dir      = "./vedio/#{vedio_id}"
+dir      = "./vedio/#{date}_#{vedio_id}"
 
 filename = "#{dir}/#{date}_#{vedio_id}"
 
