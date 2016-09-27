@@ -78,15 +78,19 @@ class Vedio
   def download_thread(thread_num = 4)
     # groups: Hash key index and array each files part
     # keys  : download ordering
-    # files : download temp files
+    # files : download temp files hash table
     groups = @list.groups
     keys   = groups.keys.sort
     files  = Hash.new
 
-    # mutex: take groups hash keys ordering
-    # files: save downloaded files as hash tables
+    # @mutex: take groups hash keys ordering and print console
+    # @files: save downloaded files as hash tables
     @mutex = Mutex.new
     @files = Mutex.new
+
+    # setting temp file directory
+    tmpdir = "./tmp/#{@vedio_id}"
+    FileUtils.mkdir_p(tmpdir) unless File.exists?(tmpdir)
 
     # download by thread default 4
     threads = []
@@ -104,23 +108,35 @@ class Vedio
           break if not key
 
           # group: take files group from groups
-          # resp : RestClient response data
           # file : save response data to temp file
+          # rty  : retry fetch ts files times
           group   = groups[key]
-          resp    = nil
-          file    = Tempfile.new(key)
+          file    = Tempfile.new([key, '.ts'], tmpdir)
+          rty     = 0
 
+
+          @mutex.synchronize { puts file.path }
           # download each group and save as tempfiles
-          group.each do |part|
-            # download and retry 3 times
-            url = link + part
-            resp = download_part(url)
+          group.each do |ts|
+            # part : duplicate a new one
+            # resp : RestClient response data
+            part  = ts
+            resp  = nil
 
-            # if muted then download and retry 3 times
-            url = link + part.insert(21, '-muted')
-            resp = download_part(url) if not resp
+            # download and retry 3 times
+            url   = link + part
+            resp  = download_part(url) if not resp
+
+            # toggle muted
+            url   = toggle_muted(url)
+            resp  = download_part(url) if not resp
 
             # error handling
+            if not resp and (rty += 1) < 3
+              @mutex.synchronize { puts '[ERROR]: ' + "#{resp} " + url }
+              redo
+            end
+            rty = 0
             @mutex.synchronize { puts '[ERROR]: ' + url } if not resp
             raise 'resp no rsp' if not resp
 
@@ -129,24 +145,10 @@ class Vedio
 
           # record file index and tempfile
           @files.synchronize { files[key] = file }
+
+          # close tempfile and concat later
+          file.close
         end
-      end
-
-      def download_part(url, retries = 3)
-        resp    = nil
-        rty     = 0
-
-        begin
-          resp = RestClient.get(url)
-        rescue
-          # default retry 3 times and sleep 3 sec
-          if (rty += 1) < retries
-            sleep 3
-            retry
-          end
-        end
-
-        return resp
       end
     end
 
@@ -155,11 +157,40 @@ class Vedio
 
     # callblock each groups and unlink tempfile
     files.sort.each do |key, file|
-      file.rewind
+      file.open
       yield(file.read) if block_given?
       file.close
       file.unlink
     end
+  end
+
+  def download_part(url, retries = 10)
+    resp    = nil
+    rty     = 0
+
+    begin
+      resp = RestClient.get(url)
+    rescue => e
+      # default retry 3 times and sleep 3 sec
+      if (rty += 1) < retries
+        sleep 3
+        retry
+      end
+    end
+
+    return resp
+  end
+
+private
+
+  def toggle_muted(url)
+    if /-muted/ =~ (url)
+      url.gsub!('-muted', '')
+    else
+      m = /index-\d+-\w+/.match(url)
+      url.insert( m.end(0), '-muted' )
+    end
+    return url
   end
 end
 
