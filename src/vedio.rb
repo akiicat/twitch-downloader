@@ -1,10 +1,8 @@
 require 'rest-client'
 require 'json'
 require 'thread'
-require 'byebug'
-require 'awesome_print'
 
-class Vedio
+class TwitchVedio
   attr_accessor :vedio_id
   attr_accessor :client_id
   attr_accessor :token

@@ -1,7 +1,7 @@
-require './parser'
+require 'src/vedio'
 
 if ARGV.length != 1
-  puts "ruby vedio.rb <url>"
+  puts "ruby download.rb <url>"
   exit
 end
 
@@ -10,13 +10,12 @@ vedio_id  = ARGV[0].split("/")[-1]
 client_id = ''
 
 # parse vedio
-vedio = Vedio.new(vedio_id, client_id)
+vedio = TwitchVedio.new(vedio_id, client_id)
 vedio.parse
 
 # vedio info
 date     = vedio.list.time.strftime("%Y%m%d")
 dir      = "./vedio/#{vedio_id}"
-
 
 filename = "#{dir}/#{date}v#{vedio_id}"
 
