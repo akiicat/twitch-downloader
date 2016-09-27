@@ -19,12 +19,13 @@ dir      = 'vedio'
 tmp      = 'tmp'
 filename = "#{dir}/#{date}v#{vedio_id}"
 
+# create files or directories if not exists
 Dir.mkdir(dir) unless File.exists?(dir)
 Dir.mkdir(tmp) unless File.exists?(tmp)
 File.open("#{filename}.m3u" , 'wb') { |f| f.write(vedio.m3u) }
 File.open("#{filename}.m3u8", 'wb') { |f| f.write(vedio.m3u8) }
 
-# xxxxxxxxvxxxxxxxx.ts
+# filename: xxxxxxxxvxxxxxxxx.ts
 file = File.open("#{filename}.ts", 'wb')
 
 # download each chunked vedio by sequence
