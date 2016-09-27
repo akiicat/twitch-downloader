@@ -7,7 +7,7 @@ end
 
 # vedio need arg
 vedio_id  = ARGV[0].split("/")[-1]
-client_id = 'fus5w6wrg143byid3xrjo44dwk6s0f7'
+client_id = ''
 
 # parse vedio
 vedio = Vedio.new(vedio_id, client_id)
