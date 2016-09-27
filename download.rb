@@ -1,4 +1,4 @@
-require 'src/vedio'
+require './src/vedio'
 
 if ARGV.length != 1
   puts "ruby download.rb <url>"

@@ -112,8 +112,6 @@ class TwitchVedio
           file    = Tempfile.new([key, '.ts'], tmpdir)
           rty     = 0
 
-
-          @mutex.synchronize { puts file.path }
           # download each group and save as tempfiles
           group.each do |ts|
             # part : duplicate a new one
