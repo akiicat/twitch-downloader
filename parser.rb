@@ -106,23 +106,47 @@ class Vedio
           # group: take files group from groups
           # resp : RestClient response data
           # file : save response data to temp file
-          group = groups[key]
-          resp  = nil
-          file  = Tempfile.new(key)
+          group   = groups[key]
+          resp    = nil
+          file    = Tempfile.new(key)
 
           # download each group and save as tempfiles
           group.each do |part|
-            begin
-              resp = RestClient.get(link + part)
-            rescue
-              resp = RestClient.get(link + part.insert(21, '-muted'))
-            end
+            # download and retry 3 times
+            url = link + part
+            resp = download_part(url)
+
+            # if muted then download and retry 3 times
+            url = link + part.insert(21, '-muted')
+            resp = download_part(url) if not resp
+
+            # error handling
+            @mutex.synchronize { puts '[ERROR]: ' + url } if not resp
+            raise 'resp no rsp' if not resp
+
             file.write(resp)
           end
 
           # record file index and tempfile
           @files.synchronize { files[key] = file }
         end
+      end
+
+      def download_part(url, retries = 3)
+        resp    = nil
+        rty     = 0
+
+        begin
+          resp = RestClient.get(url)
+        rescue
+          # default retry 3 times and sleep 3 sec
+          if (rty += 1) < retries
+            sleep 3
+            retry
+          end
+        end
+
+        return resp
       end
     end
 
