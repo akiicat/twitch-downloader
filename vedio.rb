@@ -14,14 +14,14 @@ vedio = Vedio.new(vedio_id, client_id)
 vedio.parse
 
 # vedio info
-date     = vedio.list.time.strftime("%Y%m%dT")
-dir      = 'vedio'
-tmp      = 'tmp'
+date     = vedio.list.time.strftime("%Y%m%d")
+dir      = "./vedio/#{vedio_id}"
+
+
 filename = "#{dir}/#{date}v#{vedio_id}"
 
 # create files or directories if not exists
-Dir.mkdir(dir) unless File.exists?(dir)
-Dir.mkdir(tmp) unless File.exists?(tmp)
+FileUtils.mkdir_p(dir) unless File.exists?(dir)
 File.open("#{filename}.m3u" , 'wb') { |f| f.write(vedio.m3u) }
 File.open("#{filename}.m3u8", 'wb') { |f| f.write(vedio.m3u8) }
 
