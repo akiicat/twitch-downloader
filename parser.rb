@@ -1,5 +1,6 @@
 require 'rest-client'
 require 'json'
+require 'thread'
 require 'byebug'
 require 'awesome_print'
 
@@ -37,7 +38,7 @@ class Vedio
     m3u8_info     = m3u8_list.first(8)
     @list[0..-1]  = m3u8_list.reject{ |a| a.empty? or a[0] == '#' }
 
-    # import play list info
+    # importinfo to PlayList @list
     m3u8_info.each do |part|
       time = /ID3-EQUIV-TDTG:(.+)/.match(part)
       secs = /EXT-X-TWITCH-TOTAL-SECS:([\d.]+)/.match(part)
@@ -47,11 +48,8 @@ class Vedio
     end
   end
 
-  def groups
-    @list.groups
-  end
-
   def download(start = 0, stop = Float::INFINITY)
+    # sequence download each part
     @list.each do |part|
       index = part.split('-')[1].to_i
       next if not index.between?(start, stop)
@@ -60,63 +58,86 @@ class Vedio
       # index-0000007049-876T-muted.ts?start_offset=0&end_offset=61851
       # index-0000004979-plLX      -0.ts
       # index-0000004979-plLX-muted-0.ts
-      resp = nil
-
+      # rescue if vedio is muted after download
+      resp  = nil
       begin
-        url = link + part
+        url  = link + part
         puts 'Downloading part ' + url
         resp = RestClient.get(url)
       rescue
         # 'index-xxxxxxxxxx-xxxx'.size # => 21
-        url = link + part.insert(21, '-muted')
+        url  = link + part.insert(21, '-muted')
         puts 'Rescueing part ' + url
         resp = RestClient.get(url)
       end
 
-      yield(resp)       if block_given?
+      yield(resp) if block_given?
     end
   end
 
   def download_thread(thread_num = 4)
-    @list.groups.sort_by{|k,v| k}
+    # groups: Hash key index and array each files part
+    # keys  : download ordering
+    # files : download temp files
+    groups = @list.groups
+    keys   = groups.keys.sort
+    files  = Hash.new
 
+    # mutex: take groups hash keys ordering
+    # files: save downloaded files as hash tables
+    @mutex = Mutex.new
+    @files = Mutex.new
+
+    # download by thread default 4
     threads = []
+    thread_num.times do |thread_id|
 
-    thread_num.time do |thread_id|
-      puts "Create thread id: #{thread_id}"
-      threads << Thread.new {
+      # create and save each thread and join later
+      threads[thread_id] = Thread.new do
+        while(true) do
+          key = nil
 
-      }
-    end
+          # take groups hash keys ordering and print console
+          @mutex.synchronize { puts "Downloading part #{key}" if key = keys.shift }
 
-    threads.each { |t| t.join }
-    puts "Join threads"
+          # break if end of keys array
+          break if not key
 
+          # group: take files group from groups
+          # resp : RestClient response data
+          # file : save response data to temp file
+          group = groups[key]
+          resp  = nil
+          file  = Tempfile.new(key)
 
+          # download each group and save as tempfiles
+          group.each do |part|
+            begin
+              resp = RestClient.get(link + part)
+            rescue
+              resp = RestClient.get(link + part.insert(21, '-muted'))
+            end
+            file.write(resp)
+          end
 
-    hash.keys.sort.each do |part|
-      if part[0] != '#' && part != ''
-        next if not (part.split('-')[1].to_i >= start)
-
-        begin
-          url = link + part
-          puts 'Downloading part ' + url
-          resp = RestClient.get(url)
-        rescue
-          # 'index-0000007049-876T'.size # => 21
-          # index-0000007049-876T      .ts?start_offset=0&end_offset=61851
-          # index-0000007049-876T-muted.ts?start_offset=0&end_offset=61851
-          # index-0000004979-plLX      -0.ts
-          # index-0000004979-plLX-muted-0.ts
-          url = link + part.insert(21, '-muted')
-          puts 'Rescueing part ' + url
-          resp = RestClient.get(url)
+          # record file index and tempfile
+          @files.synchronize { files[key] = file }
         end
       end
     end
+
+    # join each threads
+    threads.each { |t| t.join }
+
+    # callblock each groups and unlink tempfile
+    files.sort.each do |key, file|
+      file.rewind
+      yield(file.read) if block_given?
+      file.close
+      file.unlink
+    end
   end
 end
-
 
 class PlayList < Array
   attr_accessor :time
@@ -129,5 +150,6 @@ class PlayList < Array
       groups[key] = Array.new unless groups[key]
       groups[key].push(part)
     end
+    return groups
   end
 end
