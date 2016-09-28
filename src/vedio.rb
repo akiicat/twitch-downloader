@@ -73,13 +73,18 @@ class TwitchVedio
     end
   end
 
-  def download_thread(thread_num = 4)
+  def download_thread(thread_num = 4, start = 0, stop = 9999999999)
+    start  = "index-%010d-xxxx" % start
+    stop   = "index-%010d-xxxx" % stop
     # groups: Hash key index and array each files part
     # keys  : download ordering
     # files : download temp files hash table
     groups = @list.groups
-    keys   = groups.keys.sort
+    keys   = groups.keys.select{ |e| e > start and e < stop }.sort
     files  = Hash.new
+
+    puts "keys from #{start} to #{stop}"
+    puts "arrs from #{keys.first} to #{keys.last}"
 
     # @mutex: take groups hash keys ordering and print console
     # @files: save downloaded files as hash tables
