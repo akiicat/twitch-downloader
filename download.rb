@@ -1,4 +1,5 @@
 require './src/vedio'
+require './src/chat'
 
 if ARGV.length != 1
   puts "ruby download.rb <url>"
@@ -13,19 +14,22 @@ client_id = ''
 vedio = TwitchVedio.new(vedio_id, client_id)
 vedio.parse
 
-# vedio info
+# file directory
 date     = vedio.list.time.strftime("%Y%m%d")
 dir      = "./vedio/#{date}_#{vedio_id}"
-
-filename = "#{dir}/#{date}_#{vedio_id}"
-
-# create files or directories if not exists
 FileUtils.mkdir_p(dir) unless File.exists?(dir)
-File.open("#{filename}.m3u" , 'wb') { |f| f.write(vedio.m3u) }
-File.open("#{filename}.m3u8", 'wb') { |f| f.write(vedio.m3u8) }
+
+#################
+# Download vod  #
+#################
+# save as ...
+filename = "#{date}_#{vedio_id}"
+fullpath = "#{dir}/#{filename}"
+File.open("#{fullpath}.m3u" , 'wb') { |f| f.write(vedio.m3u) }
+File.open("#{fullpath}.m3u8", 'wb') { |f| f.write(vedio.m3u8) }
 
 # filename: xxxxxxxxvxxxxxxxx.ts
-file = File.open("#{filename}.ts", 'wb')
+file = File.open("#{fullpath}.ts", 'wb')
 
 # download each chunked vedio by sequence
 #
@@ -33,12 +37,37 @@ file = File.open("#{filename}.ts", 'wb')
 #   file.write(part)
 # end
 
-# dowload vedio by thread and concat each files after join
+# dowload vedio by thread and concat each files after threads join
 # first arg is thread number by default 4
-# vedio.download_thread(4) { |part| ... }
 #
 vedio.download_thread(4) do |part|
   file.write(part)
 end
 
 file.close
+
+#################
+# Download chat #
+#################
+# parse chatty element
+messages = Chat.new(vedio_id)
+
+# save as ...
+file     = File.open("#{fullpath}.txt", "wb")
+file_all = File.open("#{fullpath}_all.txt", "wb")
+
+messages.each do |message|
+  date    = message.time
+  sender  = message.from
+  text    = message.message
+
+  # output files
+  file.write(date + ' ' + sender + ': ' + text + "\n")
+  file_all.write(message.data + "\n")
+
+  # print console
+  puts "\033[94m" + date + " \033[92m" + sender + "\033[0m" + ": " + text
+end
+
+file.close      unless file.nil?
+file_all.close  unless file_all.nil?
