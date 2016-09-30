@@ -12,7 +12,7 @@ Use Twitch API To Download Vedio and Chat.
 Get the client ID and modify `download.rb`'s client_id
 
 ```ruby
-# vedio.rb
+# download.rb
 # client_id = ''
 client_id = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 ```
