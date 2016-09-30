@@ -2,8 +2,8 @@ require 'rest-client'
 require 'json'
 require 'thread'
 
-class TwitchVedio
-  attr_accessor :vedio_id
+class Vod
+  attr_accessor :video_id
   attr_accessor :client_id
   attr_accessor :token
   attr_accessor :m3u
@@ -11,19 +11,19 @@ class TwitchVedio
   attr_accessor :link
   attr_accessor :list
 
-  def initialize(vedio_id = nil, client_id = nil)
-    @vedio_id = vedio_id
+  def initialize(video_id = nil, client_id = nil)
+    @video_id  = video_id
     @client_id = client_id
     @list = PlayList.new
   end
 
   def parse
     # get token
-    url    = "https://api.twitch.tv/api/vods/#{@vedio_id}/access_token?client_id=#{@client_id}"
+    url    = "https://api.twitch.tv/api/vods/#{@video_id}/access_token?client_id=#{@client_id}"
     @token = JSON.parse(RestClient.get(url))
 
     # m3u
-    url    = "https://usher.ttvnw.net/vod/#{@vedio_id}?nauthsig=#{@token['sig']}&nauth=#{@token['token']}"
+    url    = "https://usher.ttvnw.net/vod/#{@video_id}?nauthsig=#{@token['sig']}&nauth=#{@token['token']}"
     @m3u   = RestClient.get(url)
 
     # url split to array
@@ -56,7 +56,7 @@ class TwitchVedio
       # index-0000007049-876T-muted.ts?start_offset=0&end_offset=61851
       # index-0000004979-plLX      -0.ts
       # index-0000004979-plLX-muted-0.ts
-      # rescue if vedio is muted after download
+      # rescue if video is muted after download
       resp  = nil
       begin
         url  = link + part
@@ -92,7 +92,7 @@ class TwitchVedio
     @files = Mutex.new
 
     # setting temp file directory
-    tmpdir = "./tmp/#{@vedio_id}"
+    tmpdir = "./tmp/#{@video_id}"
     FileUtils.mkdir_p(tmpdir) unless File.exists?(tmpdir)
 
     # download by thread default 4

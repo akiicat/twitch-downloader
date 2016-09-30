@@ -9,7 +9,7 @@ Use Twitch API To Download Vedio and Chat.
 - Redirect URI: Type `http://localhost` for testing
 - Application Category: Random choose one
 
-Get the client ID and modify `vedio.rb`'s `client_id` to your `client_id`
+Get the client ID and modify `download.rb`'s client_id
 
 ```ruby
 # vedio.rb
@@ -22,7 +22,13 @@ client_id = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 download vedio and chat which default path at `vedio/date_vedioId`
 
 ```sh
-ruby download.rb <url>
+# Usage: download.rb [options default -lvc] <url or vod id>
+#    -l, --list                       download vod m3u list and m3u8 list
+#    -v, --vod                        download vod video as ts file
+#    -c, --chat                       download vod chat
+ruby download.rb https://www.twitch.tv/user_name/v/xxxxxxxx
+ruby download.rb -lvc xxxxxxxx
+
 ```
 
 Downloaded files

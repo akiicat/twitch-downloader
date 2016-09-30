@@ -37,6 +37,7 @@ class Chat
   end
 
   def each
+    puts "from #{Time.at(@start/1000).to_datetime.to_s} to #{Time.at(@stop).to_datetime.to_s}"
     message_ids = Array.new
     timestamp   = @start
     while (timestamp <= @stop)

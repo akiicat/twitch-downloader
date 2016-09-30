@@ -1,73 +1,42 @@
-require './src/vedio'
-require './src/chat'
+require 'optparse'
+require './src/twitch'
+
+options = {}
+options[:download] = Array.new
+OptionParser.new do |opts|
+  opts.banner = "Usage: download.rb [options] <url or vod id>"
+
+  opts.on('-l', '--list', 'download vod m3u list and m3u8 list') do |v|
+    options[:download].push 'list'
+  end
+
+  opts.on('-v', '--vod', 'download vod video as ts file') do |v|
+    options[:download].push 'vod'
+  end
+
+  opts.on('-c', '--chat', 'download vod chat') do |v|
+    options[:download].push 'chat'
+  end
+
+  if options[:download].empty?
+    options[:download] = ['list', 'vod', 'chat']
+  end
+end.parse!
+
+p options
+p ARGV
 
 if ARGV.length != 1
-  puts "ruby download.rb <url>"
+  puts "ruby download.rb <url> [options]"
   exit
 end
 
-# vedio need arg
-vedio_id  = ARGV[0].split("/")[-1]
-client_id = ''
+# video need arg
+video_id  = ARGV[0].split("/")[-1]
+client_id = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 
-# parse vedio
-vedio = TwitchVedio.new(vedio_id, client_id)
-vedio.parse
-
-# file directory
-date     = vedio.list.time.strftime("%Y%m%d")
-dir      = "./vedio/#{date}_#{vedio_id}"
-FileUtils.mkdir_p(dir) unless File.exists?(dir)
-
-#################
-# Download vod  #
-#################
-# save as ...
-filename = "#{date}_#{vedio_id}"
-fullpath = "#{dir}/#{filename}"
-File.open("#{fullpath}.m3u" , 'wb') { |f| f.write(vedio.m3u) }
-File.open("#{fullpath}.m3u8", 'wb') { |f| f.write(vedio.m3u8) }
-
-# filename: xxxxxxxxvxxxxxxxx.ts
-file = File.open("#{fullpath}.ts", 'wb')
-
-# download each chunked vedio by sequence
-#
-# vedio.download do |part|
-#   file.write(part)
-# end
-
-# dowload vedio by thread and concat each files after threads join
-# first arg is thread number by default 4
-#
-vedio.download_thread(4) do |part|
-  file.write(part)
-end
-
-file.close
-
-#################
-# Download chat #
-#################
-# parse chatty element
-messages = Chat.new(vedio_id)
-
-# save as ...
-file     = File.open("#{fullpath}.txt", "wb")
-file_all = File.open("#{fullpath}_all.txt", "wb")
-
-messages.each do |message|
-  date    = message.time
-  sender  = message.from
-  text    = message.message
-
-  # output files
-  file.write(date + ' ' + sender + ': ' + text + "\n")
-  file_all.write(message.data + "\n")
-
-  # print console
-  puts "\033[94m" + date + " \033[92m" + sender + "\033[0m" + ": " + text
-end
-
-file.close      unless file.nil?
-file_all.close  unless file_all.nil?
+# parse video
+twitch = Twitch.new(video_id, client_id)
+twitch.dl_list if options[:download].include?('list')
+twitch.dl_vod  if options[:download].include?('vod')
+twitch.dl_chat if options[:download].include?('chat')
