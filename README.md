@@ -37,6 +37,7 @@ Downloaded files
 - m3u8: vod chunked list
 - ts: vedio file
 - txt: vod chat list
+- json: json file for all chat data
 
 ## Tools
 ### Concat Ts Files
