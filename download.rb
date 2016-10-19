@@ -39,7 +39,7 @@ OptionParser.new do |opts|
 end.parse!
 
 if (ARGV.length != 1)
-  puts opts
+  puts `ruby download.rb --help`
   exit
 end
 
