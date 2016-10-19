@@ -83,7 +83,6 @@ class Vod
     keys   = groups.keys.select{ |e| e > start and e < stop }.sort
     files  = Hash.new
 
-    puts "keys from #{start} to #{stop}"
     puts "arrs from #{keys.first} to #{keys.last}"
 
     # @mutex: take groups hash keys ordering and print console
