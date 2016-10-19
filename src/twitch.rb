@@ -13,17 +13,21 @@ class Twitch
     @name     = "#{@date}_#{@video_id}"
   end
 
-  def dl_list(path = "#{@dir}/list/#{@name}")
+  def dl_list()
     # default path:
     #   video/20010101_xxxxxxxxx/list/20010101_xxxxxxxxx.m3u
-    File.open("#{path}.m3u" , 'wb') { |f| f.write(@video.m3u) }
-    File.open("#{path}.m3u8", 'wb') { |f| f.write(@video.m3u8) }
+    path = "#{@dir}/list"
+    FileUtils.mkdir_p(path) unless File.exists?(path)
+    File.open("#{path}/#{@name}.m3u" , 'wb') { |f| f.write(@video.m3u) }
+    File.open("#{path}/#{@name}.m3u8", 'wb') { |f| f.write(@video.m3u8) }
   end
 
-  def dl_vod(path = "#{@dir}/vod/#{@name}")
+  def dl_vod()
+    path = "#{@dir}"
+
     FileUtils.mkdir_p(path) unless File.exists?(path)
 
-    File.open("#{path}.ts", 'wb') do |file|
+    File.open("#{path}/#{@name}.ts", 'wb') do |file|
       # dowload video by thread and concat each files after threads join
       # first arg is thread number default 4
       @video.download_thread(4) do |part|
@@ -32,12 +36,14 @@ class Twitch
     end
   end
 
-  def dl_chat(path = "#{@dir}/chat/#{@name}")
+  def dl_chat()
+    path = "#{@dir}/chat"
+    FileUtils.mkdir_p(path) unless File.exists?(path)
+
     messages  = Chat.new(@video_id)
 
-    FileUtils.mkdir_p(path) unless File.exists?(path)
-    file_text = File.open("#{path}.txt", "wb")
-    file_json = File.open("#{path}.json", "wb")
+    file_text = File.open("#{path}/#{@name}.txt", "wb")
+    file_json = File.open("#{path}/#{@name}.json", "wb")
 
     messages.each do |message|
       date    = message.time

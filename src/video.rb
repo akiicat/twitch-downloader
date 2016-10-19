@@ -82,7 +82,7 @@ class Vod
     # keys  : download ordering
     # files : download temp files hash table
     groups = @list.groups
-    keys   = groups.keys.select{ |e| e > start and e < stop }.sort
+    keys   = groups.keys.select{ |e| e >= start and e < stop }.sort
     files  = Hash.new
 
     puts "arrs from #{keys.first} to #{keys.last}"
