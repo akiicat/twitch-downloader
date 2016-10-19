@@ -5,9 +5,9 @@ Use Twitch API To Download Vedio and Chat.
 ### Get Client ID
 [Register your Application](https://www.twitch.tv/kraken/oauth2/clients/new)
 
-- Name: Type what you want
-- Redirect URI: Type `http://localhost` for testing
-- Application Category: Random choose one
+- Name: What you want
+- Redirect URI: Set this to `http://localhost` for testing
+- Application Category: `Browser Extension` or random choose one
 
 Get the client ID and modify `download.rb`'s client_id
 
@@ -16,6 +16,8 @@ Get the client ID and modify `download.rb`'s client_id
 # client_id = ''
 client_id = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 ```
+
+[Manage Your Twitch API](https://www.twitch.tv/settings/connections)
 
 ### Download
 
@@ -30,7 +32,6 @@ ruby download.rb https://www.twitch.tv/user_name/v/xxxxxxxx
 ruby download.rb -lvc xxxxxxxx
 
 ```
-
 Downloaded files
 
 - m3u: vod quality list
