@@ -21,8 +21,15 @@ class Vod
 
   def parse
     # get token
-    url    = "https://api.twitch.tv/api/vods/#{@video_id}/access_token?client_id=#{@client_id}"
-    @token = JSON.parse(RestClient.get(url))
+    begin
+      url    = "https://api.twitch.tv/api/vods/#{@video_id}/access_token?client_id=#{@client_id}"
+      @token = JSON.parse(RestClient.get(url))
+    rescue
+      puts "FAILED please check your:"
+      puts "  Video id: #{@video_id}"
+      puts "  Client id: #{@client_id}"
+      exit
+    end
 
     # m3u
     url    = "https://usher.ttvnw.net/vod/#{@video_id}?nauthsig=#{@token['sig']}&nauth=#{@token['token']}"
