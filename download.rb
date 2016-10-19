@@ -4,7 +4,17 @@ require './src/twitch'
 options = {}
 options[:download] = Array.new
 OptionParser.new do |opts|
-  opts.banner = "Usage: download.rb [options] <url or vod id>"
+  opts.banner = <<-BANNER
+    Check step below before download:
+      - Add the twitch api to `client_id`
+    Usage:
+      - ruby download.rb [options] <url or vod id>
+  BANNER
+
+  if (ARGV.length != 1)
+    puts opts
+    exit
+  end
 
   opts.on('-l', '--list', 'download vod m3u list and m3u8 list') do |v|
     options[:download].push 'list'
@@ -22,14 +32,6 @@ OptionParser.new do |opts|
     options[:download] = ['list', 'vod', 'chat']
   end
 end.parse!
-
-p options
-p ARGV
-
-if ARGV.length != 1
-  puts "ruby download.rb <url> [options]"
-  exit
-end
 
 # video need arg
 video_id  = ARGV[0].split("/")[-1]
