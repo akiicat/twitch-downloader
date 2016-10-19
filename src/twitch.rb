@@ -16,7 +16,6 @@ class Twitch
   def dl_list(path = "#{@dir}/list/#{@name}")
     # default path:
     #   video/20010101_xxxxxxxxx/list/20010101_xxxxxxxxx.m3u
-    FileUtils.mkdir_p(path) unless File.exists?(path)
     File.open("#{path}.m3u" , 'wb') { |f| f.write(@video.m3u) }
     File.open("#{path}.m3u8", 'wb') { |f| f.write(@video.m3u8) }
   end
