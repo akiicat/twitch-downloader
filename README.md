@@ -1,4 +1,4 @@
-# TwitchDown
+# Twitch Downloader
 Use Twitch API To Download Vedio and Chat.
 
 ## Usage
