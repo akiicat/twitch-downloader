@@ -32,11 +32,11 @@ OptionParser.new do |opts|
   opts.on('-t', '--to [CHUNKED]', Numeric, "end to" ) do |v|
     options[:to] = v
   end
-
-  if options[:download].empty?
-    options[:download] = ['list', 'vod', 'chat']
-  end
 end.parse!
+
+if options[:download].empty?
+  options[:download] = ['list', 'vod', 'chat']
+end
 
 if (ARGV.length != 1)
   puts `ruby download.rb --help`
