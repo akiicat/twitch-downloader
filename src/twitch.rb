@@ -2,9 +2,9 @@ require './src/video'
 require './src/chat'
 
 class Twitch
-  def initialize(video_id, client_id)
+  def initialize(video_id, client_id, start = 0, stop = 9999999999)
     @video_id = video_id
-    @video    = Vod.new(video_id, client_id)
+    @video    = Vod.new(video_id, client_id, start, stop)
     @video.parse
 
     @date     = @video.list.time.strftime("%Y%m%d")
@@ -21,7 +21,7 @@ class Twitch
     File.open("#{path}.m3u8", 'wb') { |f| f.write(@video.m3u8) }
   end
 
-  def dl_vod(path = "#{@dir}/list/#{@name}")
+  def dl_vod(path = "#{@dir}/vod/#{@name}")
     FileUtils.mkdir_p(path) unless File.exists?(path)
 
     File.open("#{path}.ts", 'wb') do |file|
@@ -30,15 +30,10 @@ class Twitch
       @video.download_thread(4) do |part|
         file.write(part)
       end
-      # download by sequence
-      # video.download do |part|
-      #   file.write(part)
-      # end
-      #
     end
   end
 
-  def dl_chat(path = "#{@dir}/list/#{@name}")
+  def dl_chat(path = "#{@dir}/chat/#{@name}")
     messages  = Chat.new(@video_id)
 
     FileUtils.mkdir_p(path) unless File.exists?(path)

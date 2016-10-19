@@ -11,10 +11,12 @@ class Vod
   attr_accessor :link
   attr_accessor :list
 
-  def initialize(video_id = nil, client_id = nil)
+  def initialize(video_id = nil, client_id = nil, start = 0, stop = 9999999999)
     @video_id  = video_id
     @client_id = client_id
     @list = PlayList.new
+    @start = start
+    @stop = stop
   end
 
   def parse
@@ -46,8 +48,8 @@ class Vod
     end
   end
 
+  # sequence thread not used
   def download(start = 0, stop = Float::INFINITY)
-    # sequence download each part
     @list.each do |part|
       index = part.split('-')[1].to_i
       next if not index.between?(start, stop)
@@ -74,8 +76,8 @@ class Vod
   end
 
   def download_thread(thread_num = 4, start = 0, stop = 9999999999)
-    start  = "index-%010d-xxxx" % start
-    stop   = "index-%010d-xxxx" % stop
+    start  = "index-%010d-xxxx" % @start
+    stop   = "index-%010d-xxxx" % @stop
     # groups: Hash key index and array each files part
     # keys  : download ordering
     # files : download temp files hash table
