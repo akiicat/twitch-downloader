@@ -52,7 +52,7 @@ class Twitch
 
       # output files
       msg = "%s %s: %s\n" % [date, sender, text]
-      file_text.write(msg          + "\n")
+      file_text.write(msg)
       file_json.write(message.data + "\n")
 
       # print console
