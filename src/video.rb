@@ -92,7 +92,7 @@ class Vod
     keys   = groups.keys.select{ |e| e >= start and e < stop }.sort
     files  = Hash.new
 
-    puts "arrs from #{keys.first} to #{keys.last}"
+    puts "from #{keys.first} to #{keys.last} next #{keys.last.split("-")[1].to_i+1}"
 
     # @mutex: take groups hash keys ordering and print console
     # @files: save downloaded files as hash tables
