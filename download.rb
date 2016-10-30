@@ -45,7 +45,7 @@ end
 
 # video need arg
 video_id  = ARGV[0].split("/")[-1]
-client_id = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+client_id = 'fus5w6wrg143byid3xrjo44dwk6s0f7'
 
 # parse video
 twitch = Twitch.new(video_id, client_id, options[:from], options[:to])
