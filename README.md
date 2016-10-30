@@ -1,27 +1,7 @@
 # Twitch Downloader
 Use Twitch API To Download Vedio and Chat.
 
-## Usage
-### Get Client ID
-[Register your Application](https://www.twitch.tv/kraken/oauth2/clients/new)
-
-- Name: What you want
-- Redirect URI: Set this to `http://localhost` for testing
-- Application Category: `Browser Extension` or random choose one
-
-Get the client ID and modify `download.rb`'s client_id
-
-```ruby
-# download.rb
-# client_id = ''
-client_id = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-```
-
-[Manage Your Twitch API](https://www.twitch.tv/settings/connections)
-
-### Download
-
-download vedio and chat which default path at `vedio/date_vedioId`
+## Download
 
 ```sh
 # Usage: download.rb [options default -lvc] <url or vod id>
@@ -32,7 +12,7 @@ ruby download.rb https://www.twitch.tv/user_name/v/xxxxxxxx
 ruby download.rb -lvc xxxxxxxx
 
 ```
-Downloaded files
+Downloaded file types
 
 - m3u: vod quality list
 - m3u8: vod chunked list
@@ -40,8 +20,7 @@ Downloaded files
 - txt: vod chat list
 - json: json file for all chat data
 
-## Tools
-### Concat Ts Files
+## Tool For Concat Ts Files
 
 if you want to concat different part of ts files
 
