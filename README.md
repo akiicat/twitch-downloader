@@ -10,8 +10,8 @@ Use Twitch API To Download Vedio and Chat.
 #    -c, --chat                       download vod chat
 ruby download.rb https://www.twitch.tv/user_name/v/xxxxxxxx
 ruby download.rb -lvc xxxxxxxx
-
 ```
+
 Downloaded file types
 
 - m3u: vod quality list
