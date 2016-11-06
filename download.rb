@@ -26,11 +26,11 @@ OptionParser.new do |opts|
     options[:download] << "chat"
   end
 
-  opts.on("-f", "--from [CHUNKED]", Numeric, "index start at" ) do |v|
+  opts.on("-f", "--from [INDEX]", Numeric, "index start at" ) do |v|
     options[:index_from] = v
   end
 
-  opts.on("-t", "--to [CHUNKED]", Numeric, "index end to" ) do |v|
+  opts.on("-t", "--to [INDEX]", Numeric, "index end to" ) do |v|
     options[:index_to] = v
   end
 
