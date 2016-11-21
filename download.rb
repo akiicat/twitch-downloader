@@ -72,10 +72,9 @@ end
 
 ## download video
 if options[:download].include?("video")
-  File.open("#{file}.ts", "wb") do |f|
-    video = twitch.download_video
-    f.write(video.read)
-  end
+  # twitch.download_video return Tempfile
+  video = twitch.download_video
+  File.rename(video, "#{file}.ts")
 end
 
 ## download chat
