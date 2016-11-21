@@ -60,18 +60,19 @@ puts "from #{indexs.min} to #{indexs.max} next #{indexs.max + 1}"
 date = twitch.timestamps.strftime("%Y%m%d")
 path = "#{Dir.pwd}/vod/#{date}_#{twitch.video_id}"
 name = "#{date}_#{twitch.video_id}"
+file = "#{path}/#{name}"
 
 FileUtils.mkdir_p(path) unless File.exists?(path)
 
 ## download info
 if options[:download].include?("info")
-  File.open("#{path}/#{name}.m3u" , "wb") { |f| f.write(twitch.m3u_file)}
-  File.open("#{path}/#{name}.m3u8", "wb") { |f| f.write(twitch.m3u8_file)}
+  File.open("#{file}.m3u" , "wb") { |f| f.write(twitch.m3u_file)}
+  File.open("#{file}.m3u8", "wb") { |f| f.write(twitch.m3u8_file)}
 end
 
 ## download video
 if options[:download].include?("video")
-  File.open("#{path}/#{name}.ts", "wb") do |f|
+  File.open("#{file}.ts", "wb") do |f|
     video = twitch.download_video
     f.write(video.read)
   end
@@ -79,8 +80,8 @@ end
 
 ## download chat
 if options[:download].include?("chat")
-  file_text = File.open("#{path}/#{name}.txt", "wb")
-  file_json = File.open("#{path}/#{name}.json", "wb")
+  file_text = File.open("#{file}.txt", "wb")
+  file_json = File.open("#{file}.json", "wb")
 
   twitch.download_chat do |message|
     date    = message.time
