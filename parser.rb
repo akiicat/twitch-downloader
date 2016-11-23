@@ -2,7 +2,6 @@ require "rest-client"
 require "json"
 require "thread"
 require "./message"
-require "awesome_print"
 require "benchmark"
 
 class Parser
