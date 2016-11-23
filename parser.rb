@@ -121,7 +121,7 @@ private
     begin
       url = "https://api.twitch.tv/api/vods/#{vid}/access_token?client_id=#{cid}"
       token = RestClient.get(url)
-    rescue => e
+    rescue
       puts "FALIED please check your video id and client id:"
       puts "  Video id: #{vid}"
       puts "  Client id: #{cid}"
