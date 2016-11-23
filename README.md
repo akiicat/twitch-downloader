@@ -3,7 +3,7 @@ Use Twitch API To Download Vedio and Chat.
 
 ## Bundle
 
-install `rest-client' gem.
+install `rest-client` gem.
 
 ```sh
 bundle install
