@@ -109,7 +109,7 @@ class Parser
 
           yield(message) if block_given?
 
-          timestamp = (message.timestamp / 1000) + 10
+          timestamp = (message.timestamp / 1000) + 5
         end
       end
     end
