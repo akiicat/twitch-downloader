@@ -152,7 +152,7 @@ private
   def get_m3u8_list(m3u8, from, to)
     hash = Hash.new
     m3u8.split("\n").reject{ |a| a.empty? or a[0] == "#" }.each do |part|
-      key = part.split("-")[1].to_i
+      key = part.to_i
       next unless (from..to).include?(key)
       hash[key] = Array.new unless hash[key]
       hash[key].push(part)
