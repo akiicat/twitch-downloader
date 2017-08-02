@@ -27,7 +27,7 @@ Downloaded file types
 
 - m3u: vod quality list
 - m3u8: vod chunked list
-- ts: vedio file
+- ts: video file
 - txt: vod chat list
 - json: json file for all chat data
 
